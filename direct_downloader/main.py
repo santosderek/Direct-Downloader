@@ -40,7 +40,7 @@ def main():
     # Path to download folder
     path = arguments.folder
     if path is None:
-        path = '.'
+        path = './'
     elif path[-len('/'):] != '/' or path[-len('/'):] != '\\':
         path += '/'
 
