@@ -9,17 +9,22 @@ import shutil
 
 
 class Download_Manager():
-    def __init__(self, list_of_urls: list, threads: int):
+    def __init__(self, list_of_urls: list, threads: int, directory_path: str):
 
         # Setting up queue
         self.queue = Queue()
+
+        # Number of threads
         self.number_of_threads = threads
 
+        # Directory downloading to
+        self.directory_path = directory_path
+
+        # Putting all urls into the queue
         for url in list_of_urls:
             # If url is blank, continue
             if url == '' or url == ' ':
                 continue
-
             self.queue.put(url)
 
     def start(self):
@@ -35,9 +40,12 @@ class Download_Manager():
 
 
 class Download_Worker():
-    def __init__(self, queue):
+    def __init__(self, queue, directory_path):
         # Init Queue
         self.queue = queue
+
+        # Path to download to
+        self.directory_path = directory_path
 
         # Init Thread
         self.thread = Thread(target=self.download, daemon=True, args=())
@@ -63,6 +71,11 @@ class Download_Worker():
                 file_name_start_pos = url.rfind('/') + 1
                 file_name = url[file_name_start_pos:]
 
+                # If a file within the directory exists, skip the file
+                if os.path.exists(self.directory_path + file_name):
+                    print('Skipping:', url)
+                    continue
+
                 # Start storing the contents of the url within a file.
                 print('Downloading', url, end=' ', flush=True)
                 with open(file_name, 'wb') as current_file:
@@ -72,25 +85,10 @@ class Download_Worker():
             except Exception as e:
                 print('ERROR DOWNLOADING:', e)
 
-
-def main():
-    """ Read a file of urls and download them using Download_Manager """
-
-    # Check if url files exists, else make it
-    if not os.path.exists('urls.txt'):
-        with open('urls.txt', 'w') as current_file:
-            current_file.write('')
-        print('urls.txt was created. Please put urls within this file.')
-        return
-
-    # Open the file, and read urls into a list
-    with open('urls.txt', 'r') as current_file:
-        list_of_urls = current_file.read().split('\n')
-
-    # Put the list into a Download_Manager and start the downloads
-    manager = Download_Manager(list_of_urls, threads=3)
-    manager.start()
-
-
-if __name__ == '__main__':
-    main()
+                # If an error occured during downloading,
+                # then delete the incomplete file
+                try:
+                    if os.path.exists(self.directory_name + file_name):
+                        os.remove(self.directory_name + file_name)
+                except Exception:
+                    pass
