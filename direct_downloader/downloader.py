@@ -1,6 +1,9 @@
 # Written by: Derek Santos
 
+# 3rd Party Modules
 import requests
+
+# Python Modules
 import os
 import re
 from threading import Thread, active_count
@@ -30,7 +33,7 @@ class Download_Manager():
     def start(self):
         """ Start the threads to download urls within the queue """
         # Setting up thread
-        self.workers = [Download_Worker(self.queue)
+        self.workers = [Download_Worker(self.queue, self.directory_path)
                         for pos in range(self.number_of_threads)]
 
         # While the queue is not empty and the amount of threads are only 1
