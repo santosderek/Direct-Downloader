@@ -81,7 +81,7 @@ class Download_Worker():
 
                 # Start storing the contents of the url within a file.
                 print('Downloading', url, end=' ', flush=True)
-                with open(file_name, 'wb') as current_file:
+                with open(self.directory_path + file_name, 'wb') as current_file:
                     req.raw.decode_content = True
                     shutil.copyfileobj(req.raw, current_file)
                 print('- Done.')

@@ -41,6 +41,8 @@ def main():
     path = arguments.folder
     if path is None:
         path = '.'
+    elif path[-len('/'):] != '/' or path[-len('/'):] != '\\':
+        path += '/'
 
     # Number of threads
     number_of_threads = arguments.threads
