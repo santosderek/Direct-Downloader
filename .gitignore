@@ -50,3 +50,4 @@ __pycache__
 build
 Direct_Downloader.egg-info
 dist
+urls.txt

@@ -54,6 +54,17 @@ class Download_Worker():
         self.thread = Thread(target=self.download, daemon=True, args=())
         self.thread.start()
 
+    def delete_file(self, path: str):
+        # Delete path if exists
+        if os.path.exists(path):
+            os.remove(path)
+
+    def get_file_name(self, path: str):
+        # The name of the file will be extracted from the url.
+        file_name_start_pos = path.rfind('/') + 1
+        file_name = path[file_name_start_pos:]
+        return file_name
+
     def download(self):
         """ Downloads a url that is stored within the queue variable """
 
@@ -62,36 +73,31 @@ class Download_Worker():
                 # Store the url to use
                 url = self.queue.get()
 
-                # Attempt connection to url
-                req = requests.get(url, stream=True)
-
-                # If could not finish download alert user and skip
-                if req.status_code != 200:
-                    print('Could not download:', url)
-                    continue
-
-                # The name of the file will be extracted from the url.
-                file_name_start_pos = url.rfind('/') + 1
-                file_name = url[file_name_start_pos:]
+                file_name = self.get_file_name(url)
 
                 # If a file within the directory exists, skip the file
                 if os.path.exists(self.directory_path + file_name):
                     print('Skipping:', url)
                     continue
 
+                # Attempt connection to url
+                req = requests.get(url, stream=True)
+
+                # If could not finish download alert user and skip
+                if req.status_code != 200:
+                    print('\nCould not download:', url)
+                    continue
+
                 # Start storing the contents of the url within a file.
-                print('Downloading', url, end=' ', flush=True)
+                print('\nDownloading', url, end=' ', flush=True)
+
                 with open(self.directory_path + file_name, 'wb') as current_file:
                     req.raw.decode_content = True
                     shutil.copyfileobj(req.raw, current_file)
                 print('- Done.')
-            except Exception as e:
-                print('ERROR DOWNLOADING:', e)
 
+            except Exception as e:
                 # If an error occured during downloading,
                 # then delete the incomplete file
-                try:
-                    if os.path.exists(self.directory_name + file_name):
-                        os.remove(self.directory_name + file_name)
-                except Exception:
-                    pass
+                print('\nERROR DOWNLOADING:', e)
+                self.delete_file(self.directory_path + file_name)
