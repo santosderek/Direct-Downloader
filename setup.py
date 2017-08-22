@@ -11,8 +11,8 @@ setup(name='Direct Downloader',
                'direct_downloader/direct_downloader.py'],
       entry_points={
           'console_scripts':
-              ['dDownloader = main:main',
-               'direct_downloader = main:main']
+              ['dDownloader = direct_downloader.main:main',
+               'direct_downloader = direct_downloader.main:main']
       },
       install_requires=[
           'requests',
