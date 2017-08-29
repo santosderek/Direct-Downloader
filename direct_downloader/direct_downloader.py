@@ -48,7 +48,10 @@ class Download_Worker():
         self.queue = queue
 
         # Path to download to
-        self.directory_path = directory_path
+        if directory_path[-1:] != '/' or directory_path[-1:] != '\\':
+            self.directory_path = directory_path + '/'
+        else:
+            self.directory_path = directory_path
 
         # Init Thread
         self.thread = Thread(target=self.download, daemon=True, args=())
@@ -77,7 +80,7 @@ class Download_Worker():
 
                 # If a file within the directory exists, skip the file
                 if os.path.exists(self.directory_path + file_name):
-                    print('Skipping:', url)
+                    print('\nSkipping:', url)
                     continue
 
                 # Attempt connection to url
@@ -94,7 +97,7 @@ class Download_Worker():
                 with open(self.directory_path + file_name, 'wb') as current_file:
                     req.raw.decode_content = True
                     shutil.copyfileobj(req.raw, current_file)
-                print('- Done.')
+                print('\n' + url, '- Done.')
 
             except Exception as e:
                 # If an error occured during downloading,
