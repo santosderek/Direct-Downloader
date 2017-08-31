@@ -9,6 +9,11 @@ import re
 from threading import Thread, active_count
 from queue import Queue
 import shutil
+import logging
+
+""" Setting up logging """
+LOG_FORMAT = "[%(levelname)s] %(asctime)s - %(message)s"
+logging.basicConfig(level=logging.DEBUG, format=LOG_FORMAT)
 
 
 class Download_Manager():
@@ -80,27 +85,26 @@ class Download_Worker():
 
                 # If a file within the directory exists, skip the file
                 if os.path.exists(self.directory_path + file_name):
-                    print('\nSkipping:', url)
+                    logging.debug('Skipping: ' + url)
                     continue
-
                 # Attempt connection to url
                 req = requests.get(url, stream=True)
 
                 # If could not finish download alert user and skip
                 if req.status_code != 200:
-                    print('\nCould not download:', url)
+                    logging.debug('Could not download:' + url)
                     continue
 
                 # Start storing the contents of the url within a file.
-                print('\nDownloading', url, end=' ', flush=True)
+                logging.info('Downloading: ' + url)
 
                 with open(self.directory_path + file_name, 'wb') as current_file:
                     req.raw.decode_content = True
                     shutil.copyfileobj(req.raw, current_file)
-                print('\n' + url, '- Done.')
+                # print('\n' + url, '- Done.')
 
             except Exception as e:
                 # If an error occured during downloading,
                 # then delete the incomplete file
-                print('\nERROR DOWNLOADING:', e)
+                logging.debug('ERROR DOWNLOADING: ' + e)
                 self.delete_file(self.directory_path + file_name)
