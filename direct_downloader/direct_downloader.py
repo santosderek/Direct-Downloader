@@ -10,6 +10,7 @@ from threading import Thread, active_count
 from queue import Queue
 import shutil
 import logging
+from time import sleep
 
 """ Setting up logging """
 LOG_FORMAT = "[%(levelname)s] %(asctime)s - %(message)s"
@@ -44,7 +45,8 @@ class Download_Manager():
         # While the queue is not empty and the amount of threads are only 1
         # NOTE: When all threads are done, there should only be the main thread
         while not self.queue.empty() or active_count() > 1:
-            pass
+            # logging.debug('QUEUE: ' + str(self.queue.qsize()))
+            sleep(0.1)
 
 
 class Download_Worker():
@@ -87,6 +89,11 @@ class Download_Worker():
                 if os.path.exists(self.directory_path + file_name):
                     logging.debug('Skipping: ' + url)
                     continue
+                    # if self.queue.empty():
+                    #    return
+                    # else:
+                    #    continue
+
                 # Attempt connection to url
                 req = requests.get(url, stream=True)
 
@@ -106,5 +113,5 @@ class Download_Worker():
             except Exception as e:
                 # If an error occured during downloading,
                 # then delete the incomplete file
-                logging.debug('ERROR DOWNLOADING: ' + e)
+                logging.debug('ERROR DOWNLOADING: ' + str(e))
                 self.delete_file(self.directory_path + file_name)
