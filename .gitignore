@@ -53,3 +53,4 @@ dist
 urls.txt
 .pypirc
 setup.cfg
+.eggs

@@ -5,7 +5,7 @@ import os
 from argparse import ArgumentParser
 
 # Developer Modules
-from direct_downloader import Download_Manager
+from directdownloader.direct_downloader import Download_Manager
 
 
 def parse_arguments():
